@@ -16,3 +16,8 @@ poo_traits_mental <- subset(breed_traits_mental,Breed == "Poodles")
 poo_traits_mental
 
 select(breed_traits,1,2,6:10)
+
+
+bull_traits_mental <- subset(breed_traits_mental,Breed == "Bulldogs")
+
+bull_traits_mental
