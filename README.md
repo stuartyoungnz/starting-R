@@ -1,3 +1,3 @@
 # starting-R
 
-# Just learning R
+# I am just learning R
