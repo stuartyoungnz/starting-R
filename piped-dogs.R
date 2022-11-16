@@ -16,3 +16,12 @@ breed_traits |>
   arrange(breed)
 
 # arrange(breed_traits, desc(drooling_level), breed)
+
+dogs_that_drool <- breed_traits |> 
+  mutate(drool_category = case_when(
+    drooling_level <= 2 ~ "Light drool",
+    drooling_level == 3 ~ "Medium drool",
+    drooling_level >= 4 ~ "Heavy drool",
+  )) |> 
+  filter (drool_category == "Heavy drool") |> 
+  arrange(desc(breed))
