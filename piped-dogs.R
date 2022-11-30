@@ -2,8 +2,7 @@
 # install.packages("dplyr")
 # install.packages("janitor")
 
-library(dplyr)
-library(janitor)
+library(tidyverse)
 
 # tuesdata <- tidytuesdayR::tt_load("2022-02-01")
 # saveRDS(tuesdata$breed_traits,"breed_traits.rds")
