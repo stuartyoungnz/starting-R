@@ -32,7 +32,6 @@ sheet3 <- sheet3[rowSums(is.na(sheet3)) != ncol(sheet3), ]
 
 # Create and populate the Platform column sheet 1
 sheet1 <- mutate(sheet1, Platform = case_when(
-  str_detect(Metric_full_description,"Total") ~ "Total",
   str_detect(Metric_full_description,"Facebook") ~ "Facebook",
   str_detect(Metric_full_description,"Twitter") ~ "Twitter",
   str_detect(Metric_full_description,"Instagram") ~ "Instagram",
@@ -40,11 +39,11 @@ sheet1 <- mutate(sheet1, Platform = case_when(
   str_detect(Metric_full_description, "SoundCloud") ~ "SoundCloud",
   str_detect(Metric_full_description, "Sound Cloud") ~ "SoundCloud",
   str_detect(Metric_full_description,"Blog") ~ "Blog",
+  str_detect(Metric_full_description,"Total") ~ "Total",
 ))
 
 # Create and populate the Platform column sheet 2
 sheet2 <- mutate(sheet2, Platform = case_when(
-  str_detect(Metric_full_description,"Total") ~ "Total",
   str_detect(Metric_full_description,"Facebook") ~ "Facebook",
   str_detect(Metric_full_description,"Twitter") ~ "Twitter",
   str_detect(Metric_full_description,"Instagram") ~ "Instagram",
@@ -52,11 +51,11 @@ sheet2 <- mutate(sheet2, Platform = case_when(
   str_detect(Metric_full_description, "SoundCloud") ~ "SoundCloud",
   str_detect(Metric_full_description, "Sound Cloud") ~ "SoundCloud",
   str_detect(Metric_full_description,"Blog") ~ "Blog",
+  str_detect(Metric_full_description,"Total") ~ "Total",
 ))
 
 # Create and populate the Platform column sheet 3
 sheet3 <- mutate(sheet3, Platform = case_when(
-  str_detect(Metric_full_description,"Total") ~ "Total",
   str_detect(Metric_full_description,"Facebook") ~ "Facebook",
   str_detect(Metric_full_description,"Twitter") ~ "Twitter",
   str_detect(Metric_full_description,"Instagram") ~ "Instagram",
@@ -64,6 +63,7 @@ sheet3 <- mutate(sheet3, Platform = case_when(
   str_detect(Metric_full_description, "SoundCloud") ~ "SoundCloud",
   str_detect(Metric_full_description, "Sound Cloud") ~ "SoundCloud",
   str_detect(Metric_full_description,"Blog") ~ "Blog",
+  str_detect(Metric_full_description,"Total") ~ "Total",
 ))
 
 # Wanted to transform the full description to get the metric but found the conditional formulas impossible.
@@ -168,17 +168,41 @@ alldata <- left_join(sheet1plus2, select(sheet3, c(Key,5:7)), by = "Key")
 # alldata2 <- purrr::reduce(list(sheet1,sheet2,sheet3), dplyr::left_join, by = 'Key')
 
 # make the data long and tidy
-alldata <- pivot_longer(alldata, c(5:31), names_to = "Month", values_to = "Value")
+longalldata <- pivot_longer(alldata, c(5:31), names_to = "Excel_date", values_to = "Value") |>
+# move the value before the date
+  relocate(Value, .before = Excel_date) |>
+# make the dates dates
+  mutate("R_date" = excel_numeric_to_date(as.numeric(Excel_date))) |>
+# split the date into Year and Month
+  mutate("Year" = as.numeric(substr(R_date, 1,4))) |>
+  mutate("Month" = format(as.Date(R_date, format="%Y-%m-%d"),"%m"))
 
-# another attempt to try to make the dates dates, thinking it would be easier to do 
-# now that they are all in a single column and not column names
-# alldata <- excel_numeric_to_date(alldata$Month)
-# alldata <- as.character(as.Date(alldata$Month))
-# alldata <- as.Date(alldata$Month)
+# Question 1 - which platform had the largest total amount of engagements 
+# (between July 2020 and September 2022 is irrelevant because this date range is all the data)
+total_engagements <- longalldata |>
+  filter(Metric == 'Engagement') |>
+  group_by(Platform, Metric) |>
+  summarise(Total = sum(Value)) |>
+  arrange(desc(Total))
+  
+head(total_engagements)
+
+# What was the peak month for each platform? 
+# Use engagements as the metric for Facebook, Instagram and Twitter. Use podcast listens as the metric for SoundCloud.
+# Use page views as the metric for blogs. Use video views as the metric for YouTube.
+
 
 
 # check contents
-head(sheet1)
-head(sheet2)
-head(sheet3)
-head(alldata)
+# head(sheet1)
+# head(sheet2)
+# head(sheet3)
+# head(alldata)
+# head(longalldata)
+# view(sheet1)
+# view(sheet2)
+# view(sheet3)
+# view(alldata)
+# view(longalldata)
+
+
