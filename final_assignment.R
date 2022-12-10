@@ -35,11 +35,11 @@ sheet1 <- mutate(sheet1, Platform = case_when(
   str_detect(Metric_full_description,"Facebook") ~ "Facebook",
   str_detect(Metric_full_description,"Twitter") ~ "Twitter",
   str_detect(Metric_full_description,"Instagram") ~ "Instagram",
-  str_detect(Metric_full_description, "YouTube") ~ "YouTube",
   str_detect(Metric_full_description, "SoundCloud") ~ "SoundCloud",
   str_detect(Metric_full_description, "Sound Cloud") ~ "SoundCloud",
   str_detect(Metric_full_description,"Blog") ~ "Blog",
   str_detect(Metric_full_description,"Total") ~ "Total",
+  str_detect(Metric_full_description, "YouTube") ~ "YouTube",
 ))
 
 # Create and populate the Platform column sheet 2
@@ -47,11 +47,11 @@ sheet2 <- mutate(sheet2, Platform = case_when(
   str_detect(Metric_full_description,"Facebook") ~ "Facebook",
   str_detect(Metric_full_description,"Twitter") ~ "Twitter",
   str_detect(Metric_full_description,"Instagram") ~ "Instagram",
-  str_detect(Metric_full_description, "YouTube") ~ "YouTube",
   str_detect(Metric_full_description, "SoundCloud") ~ "SoundCloud",
   str_detect(Metric_full_description, "Sound Cloud") ~ "SoundCloud",
   str_detect(Metric_full_description,"Blog") ~ "Blog",
   str_detect(Metric_full_description,"Total") ~ "Total",
+  str_detect(Metric_full_description, "YouTube") ~ "YouTube",
 ))
 
 # Create and populate the Platform column sheet 3
@@ -59,11 +59,11 @@ sheet3 <- mutate(sheet3, Platform = case_when(
   str_detect(Metric_full_description,"Facebook") ~ "Facebook",
   str_detect(Metric_full_description,"Twitter") ~ "Twitter",
   str_detect(Metric_full_description,"Instagram") ~ "Instagram",
-  str_detect(Metric_full_description, "YouTube") ~ "YouTube",
   str_detect(Metric_full_description, "SoundCloud") ~ "SoundCloud",
   str_detect(Metric_full_description, "Sound Cloud") ~ "SoundCloud",
   str_detect(Metric_full_description,"Blog") ~ "Blog",
   str_detect(Metric_full_description,"Total") ~ "Total",
+  str_detect(Metric_full_description, "YouTube") ~ "YouTube",
 ))
 
 # Wanted to transform the full description to get the metric but found the conditional formulas impossible.
@@ -178,7 +178,7 @@ longalldata <- pivot_longer(alldata, c(5:31), names_to = "Excel_date", values_to
   mutate("Month" = format(as.Date(R_date, format="%Y-%m-%d"),"%m"))
 
 # Question 1 - which platform had the largest total amount of engagements 
-# (between July 2020 and September 2022 is irrelevant because this date range is all the data)
+# (criteria between July 2020 and September 2022 is irrelevant because that date range is all the data)
 total_engagements <- longalldata |>
   filter(Metric == 'Engagement') |>
   group_by(Platform, Metric) |>
@@ -191,6 +191,24 @@ head(total_engagements)
 # Use engagements as the metric for Facebook, Instagram and Twitter. Use podcast listens as the metric for SoundCloud.
 # Use page views as the metric for blogs. Use video views as the metric for YouTube.
 
+top_month <- longalldata |>
+  group_by(Key) |>
+  top_n(1, Value) |> 
+  subset(Key %in% c('Facebook_Engagement','Twitter_Engagement', 'Instagram_Engagement',
+                  'SoundCloud_Podcast_listens', 'Blog_Page_views', 'YouTube_Video_views')) |>
+  select(Key,Value,R_date)
+
+head(top_month)
+
+# Answers by looking in Excel to check
+# Facebook engagement	13587	Aug-22
+# Instagram engagement 	2743	Jul-20
+# Twitter engagement	1462	Jul-21
+# Blog page views	52479	Jul-21
+# YouTube views	24356	Sep-21
+# Sound Cloud podcast listens	5069	Sep-21
+
+# They match !!!
 
 
 # check contents
